@@ -1,0 +1,59 @@
+// use prisma-8
+// Contract inferred from the live database schema. Edit as needed, then run `prisma contract emit`.
+
+model User {
+  id        Int                   @id(map: "User_pkey") @default(autoincrement())
+  email     String                @unique(map: "User_email_key")
+  name      String?
+  createdAt DateTime              @default(now())
+  username  String?
+  updatedAt DateTime
+  password  String?
+  address   String?
+  embedding pgvector.Vector(768)?
+  posts     Post[]
+}
+
+model Post {
+  id        Int      @id(map: "Post_pkey") @default(autoincrement())
+  title     String
+  content   String?
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "Post_authorId_fkey")
+
+  @@index([authorId], name: "Post_authorId_idx")
+}
+
+model Producto {
+  id          Int                   @id(map: "productos_pkey") @default(autoincrement())
+  nombre      String
+  precio      Float
+  cantidad    Int
+  descripcion String
+  embedding   pgvector.Vector(768)?
+
+  @@map("productos")
+}
+
+namespace extensions {
+  extension pg_stat_statements {
+  }
+
+  extension pgcrypto {
+  }
+
+  extension uuid-ossp {
+  }
+}
+
+namespace graphql {
+  extension pg_graphql {
+  }
+}
+
+namespace vault {
+  extension supabase_vault {
+  }
+}
